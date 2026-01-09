@@ -11,7 +11,7 @@ import Header from '@/components/Header';
 import ChatInput from '@/components/ChatInput';
 import ChatMessage from '@/components/ChatMessage';
 import WelcomeScreen from '@/components/WelcomeScreen';
-import { claude } from './lib/claude';
+import { claude, jailbreakGPT } from './lib/claude';
 import { initDB, saveAllSessionsToDB, getAllSessionsFromDB, clearDB } from './lib/db';
 
 // Types
@@ -39,6 +39,7 @@ function MainApp() {
     const [isLoading, setIsLoading] = useState(false);
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [customInstruction, setCustomInstruction] = useState('');
+    const [jailbreakMode, setJailbreakMode] = useState(false);
 
     // UI State
     const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed on mobile
@@ -220,7 +221,9 @@ function MainApp() {
                 contextMessage = `[Previous Context]\n${historyContext}\n\n[User Message]\n${content}`;
             }
 
-            const data = await claude({
+            // Use jailbreak GPT or normal Claude based on mode
+            const apiCall = jailbreakMode ? jailbreakGPT : claude;
+            const data = await apiCall({
                 message: contextMessage,
                 instruction: customInstruction,
                 sessionId: currentSess?.aiSessionId,
@@ -246,7 +249,7 @@ function MainApp() {
         } finally {
             setIsLoading(false);
         }
-    }, [currentSessionId, sessions, isLoading, customInstruction]);
+    }, [currentSessionId, sessions, isLoading, customInstruction, jailbreakMode]);
 
     const handleAnimationComplete = useCallback((msgId: string) => {
         setSessions(prev => prev.map(s => {
@@ -281,6 +284,8 @@ function MainApp() {
                 onClearAll={handleClearAll}
                 customInstruction={customInstruction}
                 setCustomInstruction={setCustomInstruction}
+                jailbreakMode={jailbreakMode}
+                setJailbreakMode={setJailbreakMode}
             />
 
             <main className="flex-1 flex flex-col min-w-0 relative">
