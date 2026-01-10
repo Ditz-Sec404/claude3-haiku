@@ -52,12 +52,11 @@ export const claude = async (data: ClaudeRequest): Promise<ClaudeResponse> => {
     return response.data;
 };
 
-// Jailbreak GPT API (wewordle.org) with CORS proxy
+// Jailbreak GPT API (wewordle.org)
 export const jailbreakGPT = async (data: ClaudeRequest): Promise<ClaudeResponse> => {
     const { message, instruction, signal } = data;
 
-    // Use CORS proxy to bypass restrictions
-    const CORS_PROXY = 'https://cors.caliph.my.id/';
+    // Try direct API first, fallback to proxy if needed
     const API_URL = 'https://wewordle.org/gptapi/v1/web/turbo';
 
     // Combine jailbreak prompt with user message directly
@@ -72,7 +71,7 @@ export const jailbreakGPT = async (data: ClaudeRequest): Promise<ClaudeResponse>
     ];
 
     try {
-        const response = await fetch(CORS_PROXY + API_URL, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
