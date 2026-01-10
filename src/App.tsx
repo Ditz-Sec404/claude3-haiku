@@ -13,13 +13,14 @@ import ChatMessage from '@/components/ChatMessage';
 import WelcomeScreen from '@/components/WelcomeScreen';
 import { claude, jailbreakGPT } from './lib/claude';
 import { initDB, saveAllSessionsToDB, getAllSessionsFromDB, clearDB } from './lib/db';
+import { toast } from 'sonner';
 
-// Types
 interface Message {
     id: string;
     role: 'user' | 'assistant';
     content: string;
     isAnimated?: boolean;
+    isError?: boolean;
 }
 
 interface ChatSession {
@@ -239,12 +240,18 @@ function MainApp() {
                 return s;
             }));
         } catch (e: any) {
-            if (e.name !== 'CanceledError' && e.message !== 'canceled') {
-                const errorMsg: Message = { id: Date.now().toString(), role: 'assistant', content: 'Sorry, an error occurred. Please try again.' };
+            if (e.name !== 'CanceledError' && e.message !== 'canceled' && e.name !== 'AbortError') {
+                const errorMsg: Message = {
+                    id: Date.now().toString(),
+                    role: 'assistant',
+                    content: 'Maaf, terjadi kesalahan. Silakan coba lagi.',
+                    isError: true
+                };
                 setSessions(prev => prev.map(s => {
                     if (s.id === currentSessionId) return { ...s, messages: [...s.messages, errorMsg] };
                     return s;
                 }));
+                toast.error('Gagal mendapatkan respons');
             }
         } finally {
             setIsLoading(false);
@@ -266,6 +273,69 @@ function MainApp() {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages.length, isLoading]);
+
+    // Stop generating
+    const handleStop = useCallback(() => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            setIsLoading(false);
+            toast.info('Generasi dihentikan');
+        }
+    }, []);
+
+    // Regenerate last response
+    const handleRegenerate = useCallback(() => {
+        if (!currentSessionId || isLoading) return;
+
+        const currentSess = sessions.find(s => s.id === currentSessionId);
+        if (!currentSess || currentSess.messages.length < 2) return;
+
+        // Find last user message
+        const lastUserMsg = [...currentSess.messages].reverse().find(m => m.role === 'user');
+        if (!lastUserMsg) return;
+
+        // Remove last assistant message
+        setSessions(prev => prev.map(s => {
+            if (s.id === currentSessionId) {
+                const msgs = [...s.messages];
+                if (msgs[msgs.length - 1]?.role === 'assistant') {
+                    msgs.pop();
+                }
+                return { ...s, messages: msgs };
+            }
+            return s;
+        }));
+
+        // Resend
+        setTimeout(() => handleSend(lastUserMsg.content), 100);
+    }, [currentSessionId, sessions, isLoading, handleSend]);
+
+    // Edit user message
+    const handleEditMessage = useCallback((msgId: string, newContent: string) => {
+        if (!currentSessionId) return;
+
+        setSessions(prev => prev.map(s => {
+            if (s.id === currentSessionId) {
+                const msgIndex = s.messages.findIndex(m => m.id === msgId);
+                if (msgIndex === -1) return s;
+
+                // Remove all messages after this one
+                const newMessages = s.messages.slice(0, msgIndex + 1);
+                newMessages[msgIndex] = { ...newMessages[msgIndex], content: newContent };
+
+                return { ...s, messages: newMessages };
+            }
+            return s;
+        }));
+
+        // Resend the edited message
+        setTimeout(() => handleSend(newContent), 100);
+    }, [currentSessionId, handleSend]);
+
+    // Retry after error
+    const handleRetry = useCallback(() => {
+        handleRegenerate();
+    }, [handleRegenerate]);
 
     return (
         <div className="flex h-screen bg-background overflow-hidden font-sans">
@@ -303,14 +373,18 @@ function MainApp() {
                             </div>
                         ) : (
                             <div className="max-w-3xl mx-auto py-6 space-y-6 pb-4">
-                                {messages.map(m => (
+                                {messages.map((m, index) => (
                                     <ChatMessage
                                         key={m.id}
                                         id={m.id}
                                         content={m.content}
                                         role={m.role}
                                         isAnimated={m.isAnimated}
+                                        isError={m.isError}
                                         onAnimationComplete={handleAnimationComplete}
+                                        onRegenerate={m.role === 'assistant' && index === messages.length - 1 ? handleRegenerate : undefined}
+                                        onEdit={m.role === 'user' ? handleEditMessage : undefined}
+                                        onRetry={m.isError ? handleRetry : undefined}
                                     />
                                 ))}
                                 {isLoading && (
@@ -326,9 +400,14 @@ function MainApp() {
                         )}
                     </div>
 
-                    {/* Footer input area - transparent background */}
+                    {/* Footer input area */}
                     <div className="z-10 w-full py-4">
-                        <ChatInput onSend={handleSend} disabled={isLoading} />
+                        <ChatInput
+                            onSend={handleSend}
+                            onStop={handleStop}
+                            disabled={false}
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
             </main>

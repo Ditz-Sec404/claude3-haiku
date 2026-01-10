@@ -1,20 +1,22 @@
 import { useState, useRef } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
+  onStop?: () => void;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
-const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
+const ChatInput = ({ onSend, onStop, disabled, isLoading }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = () => {
-    if (message.trim() && !disabled) {
+    if (message.trim() && !disabled && !isLoading) {
       onSend(message.trim());
       setMessage("");
       if (inputRef.current) {
@@ -59,30 +61,41 @@ const ChatInput = ({ onSend, disabled }: ChatInputProps) => {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder="Ketik pesan..."
-              disabled={disabled}
+              disabled={disabled || isLoading}
               rows={1}
               className="w-full bg-transparent resize-none outline-none text-sm leading-relaxed placeholder:text-muted-foreground scrollbar-thin max-h-[200px]"
             />
           </div>
 
-          {/* Send button */}
+          {/* Send/Stop button */}
           <div className="flex gap-1 pb-1">
-            <Button
-              variant="chat"
-              size="icon-sm"
-              onClick={handleSubmit}
-              disabled={!message.trim() || disabled}
-              className="disabled:opacity-30"
-            >
-              <ArrowUp size={16} strokeWidth={2.5} />
-            </Button>
+            {isLoading ? (
+              <Button
+                variant="destructive"
+                size="icon-sm"
+                onClick={onStop}
+                className="animate-pulse"
+              >
+                <Square size={14} fill="currentColor" />
+              </Button>
+            ) : (
+              <Button
+                variant="chat"
+                size="icon-sm"
+                onClick={handleSubmit}
+                disabled={!message.trim() || disabled}
+                className="disabled:opacity-30"
+              >
+                <ArrowUp size={16} strokeWidth={2.5} />
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Footer text */}
       <p className="text-xs text-center text-muted-foreground mt-3">
-        Claude bisa membuat kesalahan. Harap periksa kembali jawabannya.
+        {isLoading ? "Sedang memproses..." : "Claude bisa membuat kesalahan. Harap periksa kembali jawabannya."}
       </p>
     </div>
   );
