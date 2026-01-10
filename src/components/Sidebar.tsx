@@ -12,7 +12,6 @@ import { Trash2, PanelLeftClose, Share2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import SettingsDialog from "./SettingsDialog";
-import { CodeThemeKey } from "./MessageContent";
 
 interface ChatHistory {
   id: string;
@@ -34,8 +33,6 @@ interface SidebarProps {
   setCustomInstruction: (val: string) => void;
   jailbreakMode: boolean;
   setJailbreakMode: (val: boolean) => void;
-  codeTheme: CodeThemeKey;
-  setCodeTheme: (val: CodeThemeKey) => void;
   onShareChat: () => void;
 }
 
@@ -52,8 +49,6 @@ const Sidebar = ({
   setCustomInstruction,
   jailbreakMode,
   setJailbreakMode,
-  codeTheme,
-  setCodeTheme,
   onShareChat
 }: SidebarProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -176,8 +171,6 @@ const Sidebar = ({
         setCustomInstruction={setCustomInstruction}
         jailbreakMode={jailbreakMode}
         setJailbreakMode={setJailbreakMode}
-        codeTheme={codeTheme}
-        setCodeTheme={setCodeTheme}
       />
 
       {/* Confirm Clear All Dialog */}

@@ -14,7 +14,6 @@ import WelcomeScreen from '@/components/WelcomeScreen';
 import { claude, jailbreakGPT } from './lib/claude';
 import { initDB, saveAllSessionsToDB, getAllSessionsFromDB, clearDB } from './lib/db';
 import { toast } from 'sonner';
-import { CodeThemeKey } from './components/MessageContent';
 import ShareDialog from './components/ShareDialog';
 import SharedChatView from './components/SharedChatView';
 import { SharedChat } from './lib/share';
@@ -45,7 +44,6 @@ function MainApp() {
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [customInstruction, setCustomInstruction] = useState('');
     const [jailbreakMode, setJailbreakMode] = useState(false);
-    const [codeTheme, setCodeTheme] = useState<CodeThemeKey>('atom-one');
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [chatToShare, setChatToShare] = useState<SharedChat | null>(null);
 
@@ -363,8 +361,6 @@ function MainApp() {
                 setCustomInstruction={setCustomInstruction}
                 jailbreakMode={jailbreakMode}
                 setJailbreakMode={setJailbreakMode}
-                codeTheme={codeTheme}
-                setCodeTheme={setCodeTheme}
                 onShareChat={() => {
                     if (currentSession) {
                         setChatToShare({
