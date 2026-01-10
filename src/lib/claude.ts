@@ -81,8 +81,26 @@ export const jailbreakGPT = async (data: ClaudeRequest): Promise<ClaudeResponse>
             signal
         });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+
         const json = await response.json();
-        const text = json?.message?.content || 'Terjadi kesalahan saat mengambil jawaban';
+
+        // Try multiple response structures
+        let text = '';
+        if (json?.message?.content) {
+            text = json.message.content;
+        } else if (json?.choices?.[0]?.message?.content) {
+            text = json.choices[0].message.content;
+        } else if (json?.content) {
+            text = json.content;
+        } else if (typeof json === 'string') {
+            text = json;
+        } else {
+            console.error('Unknown response structure:', json);
+            text = 'Format respons tidak dikenali. Coba lagi.';
+        }
 
         return {
             text,
@@ -92,8 +110,9 @@ export const jailbreakGPT = async (data: ClaudeRequest): Promise<ClaudeResponse>
         if (e.name === 'AbortError') {
             throw e;
         }
+        console.error('JailbreakGPT error:', e);
         return {
-            text: 'Gagal menghubungi server Jailbreak. Coba lagi nanti.',
+            text: `Gagal menghubungi server GPT: ${e.message || 'Unknown error'}`,
             sessionId: null
         };
     }
