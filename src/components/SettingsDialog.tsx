@@ -75,11 +75,11 @@ const SettingsDialog = ({
           </div>
 
           <div className="space-y-6">
-            {/* Jailbreak Mode Section */}
+            {/* GPT Mode Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Zap size={18} className="text-yellow-500" />
-                <h3 className="text-sm font-medium text-muted-foreground">Mode Jailbreak</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Mode GPT</h3>
               </div>
               <button
                 onClick={() => setJailbreakMode(!jailbreakMode)}
@@ -99,7 +99,7 @@ const SettingsDialog = ({
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {jailbreakMode
-                      ? "Menggunakan GPT Turbo (tanpa filter)"
+                      ? "Menggunakan GPT Turbo"
                       : "Menggunakan Claude 3 Haiku (default)"}
                   </span>
                 </div>
@@ -114,7 +114,7 @@ const SettingsDialog = ({
                 </div>
               </button>
               <p className="text-xs text-muted-foreground mt-2">
-                Mode Jailbreak menggunakan model GPT alternatif yang lebih bebas tanpa batasan.
+                Model alternatif untuk variasi jawaban. Bukan bypass filter, hanya mengganti AI yang digunakan.
               </p>
             </div>
 
