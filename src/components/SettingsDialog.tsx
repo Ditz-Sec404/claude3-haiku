@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Moon, Sun, Zap } from "lucide-react";
+import { Moon, Sun, Zap, Code, Palette } from "lucide-react";
 import { CloseCircle, Setting2, MagicStar } from "iconsax-react";
 import { Button } from "./ui/button";
 import { useTheme } from "./ThemeProvider";
 import { cn } from "@/lib/utils";
+import { CODE_THEMES, CodeThemeKey } from "./MessageContent";
 
 interface SettingsDialogProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface SettingsDialogProps {
   setCustomInstruction: (val: string) => void;
   jailbreakMode: boolean;
   setJailbreakMode: (val: boolean) => void;
+  codeTheme: CodeThemeKey;
+  setCodeTheme: (val: CodeThemeKey) => void;
 }
 
 const SettingsDialog = ({
@@ -20,7 +23,9 @@ const SettingsDialog = ({
   customInstruction,
   setCustomInstruction,
   jailbreakMode,
-  setJailbreakMode
+  setJailbreakMode,
+  codeTheme,
+  setCodeTheme
 }: SettingsDialogProps) => {
   const { theme, setTheme } = useTheme();
   const [visible, setVisible] = useState(false);
@@ -115,6 +120,34 @@ const SettingsDialog = ({
               </button>
               <p className="text-xs text-muted-foreground mt-2">
                 Model alternatif untuk variasi jawaban. Bukan bypass filter, hanya mengganti AI yang digunakan.
+              </p>
+            </div>
+
+            {/* Code Theme Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Palette size={18} className="text-purple-500" />
+                <h3 className="text-sm font-medium text-muted-foreground">Tema Syntax Highlighting</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {(Object.keys(CODE_THEMES) as CodeThemeKey[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setCodeTheme(key)}
+                    className={cn(
+                      "flex items-center gap-2 py-2.5 px-3 rounded-xl border-2 transition-all duration-150 text-left",
+                      codeTheme === key
+                        ? "border-purple-500 bg-purple-500/10 text-purple-500"
+                        : "border-border hover:border-purple-500/50 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Code size={16} />
+                    <span className="text-sm font-medium">{CODE_THEMES[key].name}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Pilih tema warna untuk blok kode di dalam pesan.
               </p>
             </div>
 

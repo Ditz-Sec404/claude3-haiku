@@ -8,10 +8,11 @@ import {
   Star1,
   Trash
 } from "iconsax-react";
-import { Trash2, PanelLeftClose } from "lucide-react";
+import { Trash2, PanelLeftClose, Share2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import SettingsDialog from "./SettingsDialog";
+import { CodeThemeKey } from "./MessageContent";
 
 interface ChatHistory {
   id: string;
@@ -33,6 +34,9 @@ interface SidebarProps {
   setCustomInstruction: (val: string) => void;
   jailbreakMode: boolean;
   setJailbreakMode: (val: boolean) => void;
+  codeTheme: CodeThemeKey;
+  setCodeTheme: (val: CodeThemeKey) => void;
+  onShareChat: () => void;
 }
 
 const Sidebar = ({
@@ -47,7 +51,10 @@ const Sidebar = ({
   customInstruction,
   setCustomInstruction,
   jailbreakMode,
-  setJailbreakMode
+  setJailbreakMode,
+  codeTheme,
+  setCodeTheme,
+  onShareChat
 }: SidebarProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmClearAll, setConfirmClearAll] = useState(false);
@@ -135,6 +142,15 @@ const Sidebar = ({
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent"
+                onClick={onShareChat}
+                disabled={!activeChat}
+              >
+                <Share2 size={18} />
+                <span>Bagikan Chat</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent"
                 onClick={() => setSettingsOpen(true)}
               >
                 <Setting2 size={18} variant="Linear" />
@@ -160,6 +176,8 @@ const Sidebar = ({
         setCustomInstruction={setCustomInstruction}
         jailbreakMode={jailbreakMode}
         setJailbreakMode={setJailbreakMode}
+        codeTheme={codeTheme}
+        setCodeTheme={setCodeTheme}
       />
 
       {/* Confirm Clear All Dialog */}

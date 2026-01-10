@@ -14,6 +14,10 @@ import WelcomeScreen from '@/components/WelcomeScreen';
 import { claude, jailbreakGPT } from './lib/claude';
 import { initDB, saveAllSessionsToDB, getAllSessionsFromDB, clearDB } from './lib/db';
 import { toast } from 'sonner';
+import { CodeThemeKey } from './components/MessageContent';
+import ShareDialog from './components/ShareDialog';
+import SharedChatView from './components/SharedChatView';
+import { SharedChat } from './lib/share';
 
 interface Message {
     id: string;
@@ -41,6 +45,9 @@ function MainApp() {
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [customInstruction, setCustomInstruction] = useState('');
     const [jailbreakMode, setJailbreakMode] = useState(false);
+    const [codeTheme, setCodeTheme] = useState<CodeThemeKey>('atom-one');
+    const [shareDialogOpen, setShareDialogOpen] = useState(false);
+    const [chatToShare, setChatToShare] = useState<SharedChat | null>(null);
 
     // UI State
     const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed on mobile
@@ -356,6 +363,18 @@ function MainApp() {
                 setCustomInstruction={setCustomInstruction}
                 jailbreakMode={jailbreakMode}
                 setJailbreakMode={setJailbreakMode}
+                codeTheme={codeTheme}
+                setCodeTheme={setCodeTheme}
+                onShareChat={() => {
+                    if (currentSession) {
+                        setChatToShare({
+                            title: currentSession.title,
+                            messages: currentSession.messages.map(m => ({ role: m.role, content: m.content })),
+                            sharedAt: Date.now()
+                        });
+                        setShareDialogOpen(true);
+                    }
+                }}
             />
 
             <main className="flex-1 flex flex-col min-w-0 relative">
@@ -419,6 +438,13 @@ function MainApp() {
                     className="fixed inset-0 bg-black/40 z-40 lg:hidden"
                 />
             )}
+
+            {/* Share Dialog */}
+            <ShareDialog
+                isOpen={shareDialogOpen}
+                onClose={() => setShareDialogOpen(false)}
+                chat={chatToShare}
+            />
         </div>
     );
 }
@@ -431,6 +457,7 @@ const App = () => (
                 <Sonner />
                 <BrowserRouter>
                     <Routes>
+                        <Route path="/share" element={<SharedChatView />} />
                         <Route path="*" element={<MainApp />} />
                     </Routes>
                 </BrowserRouter>

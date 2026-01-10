@@ -1,9 +1,19 @@
-import { useState, useEffect, useRef, useMemo, memo } from 'react'
+import { useState, useEffect, useRef, useMemo, memo, createContext, useContext } from 'react'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { atomOneLight, atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import {
+    atomOneDark,
+    atomOneLight,
+    dracula,
+    github,
+    vs2015,
+    monokai,
+    nord,
+    solarizedDark,
+    solarizedLight
+} from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import python from 'react-syntax-highlighter/dist/esm/languages/hljs/python'
 import javascript from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript'
 import typescript from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript'
@@ -29,6 +39,23 @@ SyntaxHighlighter.registerLanguage('css', css)
 SyntaxHighlighter.registerLanguage('json', json)
 SyntaxHighlighter.registerLanguage('bash', bash)
 SyntaxHighlighter.registerLanguage('sh', bash)
+
+// Code theme options
+export const CODE_THEMES = {
+    'atom-one': { name: 'Atom One', dark: atomOneDark, light: atomOneLight },
+    'dracula': { name: 'Dracula', dark: dracula, light: github },
+    'github': { name: 'GitHub', dark: vs2015, light: github },
+    'monokai': { name: 'Monokai', dark: monokai, light: atomOneLight },
+    'nord': { name: 'Nord', dark: nord, light: atomOneLight },
+    'solarized': { name: 'Solarized', dark: solarizedDark, light: solarizedLight },
+} as const;
+
+export type CodeThemeKey = keyof typeof CODE_THEMES;
+
+// Context for code theme
+const CodeThemeContext = createContext<CodeThemeKey>('atom-one');
+export const useCodeTheme = () => useContext(CodeThemeContext);
+export const CodeThemeProvider = CodeThemeContext.Provider;
 
 const CopyButton = ({ content }: { content: string }) => {
     const [copied, setCopied] = useState(false)
@@ -190,11 +217,18 @@ interface MessageContentProps {
     isAnimated?: boolean
     onAnimationComplete?: () => void
     onStreamUpdate?: () => void
+    codeTheme?: CodeThemeKey
 }
 
-const MessageContent = memo(({ content, isAnimated, onAnimationComplete, onStreamUpdate }: MessageContentProps) => {
+const MessageContent = memo(({ content, isAnimated, onAnimationComplete, onStreamUpdate, codeTheme = 'atom-one' }: MessageContentProps) => {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
+
+    // Get the appropriate style based on theme
+    const syntaxTheme = useMemo(() => {
+        const themeConfig = CODE_THEMES[codeTheme];
+        return isDark ? themeConfig.dark : themeConfig.light;
+    }, [codeTheme, isDark]);
 
     const codeComponents = useMemo(() => ({
         code({ className, children, ...props }: any) {
@@ -284,7 +318,7 @@ const MessageContent = memo(({ content, isAnimated, onAnimationComplete, onStrea
                         <CopyButton content={String(children).replace(/\n$/, '')} />
                     </div>
                     <SyntaxHighlighter
-                        style={isDark ? atomOneDark : atomOneLight}
+                        style={syntaxTheme}
                         language={language}
                         customStyle={{
                             margin: 0,
@@ -324,7 +358,7 @@ const MessageContent = memo(({ content, isAnimated, onAnimationComplete, onStrea
         td({ children, ...props }: any) {
             return <td {...props} className="px-4 py-3 border-b border-border min-w-[140px]">{children}</td>
         }
-    }), [isDark])
+    }), [isDark, syntaxTheme])
 
     if (isAnimated) {
         return (
