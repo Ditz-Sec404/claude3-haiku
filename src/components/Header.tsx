@@ -1,14 +1,16 @@
 import { Add } from "iconsax-react";
-import { PanelLeftOpen } from "lucide-react";
+import { PanelLeftOpen, Share2 } from "lucide-react";
 import { Button } from "./ui/button";
 
 interface HeaderProps {
   onMenuClick: () => void;
   showSidebar: boolean;
   onNewChat: () => void;
+  onShareChat?: () => void;
+  hasMessages?: boolean;
 }
 
-const Header = ({ onMenuClick, showSidebar, onNewChat }: HeaderProps) => {
+const Header = ({ onMenuClick, showSidebar, onNewChat, onShareChat, hasMessages }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="flex items-center gap-3">
@@ -25,6 +27,16 @@ const Header = ({ onMenuClick, showSidebar, onNewChat }: HeaderProps) => {
       </div>
 
       <div className="flex items-center gap-2">
+        {hasMessages && onShareChat && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onShareChat}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Share2 size={18} />
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="icon-sm"

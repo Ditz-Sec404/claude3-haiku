@@ -361,16 +361,6 @@ function MainApp() {
                 setCustomInstruction={setCustomInstruction}
                 jailbreakMode={jailbreakMode}
                 setJailbreakMode={setJailbreakMode}
-                onShareChat={() => {
-                    if (currentSession) {
-                        setChatToShare({
-                            title: currentSession.title,
-                            messages: currentSession.messages.map(m => ({ role: m.role, content: m.content })),
-                            sharedAt: Date.now()
-                        });
-                        setShareDialogOpen(true);
-                    }
-                }}
             />
 
             <main className="flex-1 flex flex-col min-w-0 relative">
@@ -378,6 +368,17 @@ function MainApp() {
                     onMenuClick={() => setSidebarOpen(!sidebarOpen)}
                     showSidebar={sidebarOpen}
                     onNewChat={createNewSession}
+                    hasMessages={messages.length > 0}
+                    onShareChat={() => {
+                        if (currentSession) {
+                            setChatToShare({
+                                title: currentSession.title,
+                                messages: currentSession.messages.map(m => ({ role: m.role, content: m.content })),
+                                sharedAt: Date.now()
+                            });
+                            setShareDialogOpen(true);
+                        }
+                    }}
                 />
 
                 <div className="flex-1 overflow-hidden flex flex-col relative z-0">
