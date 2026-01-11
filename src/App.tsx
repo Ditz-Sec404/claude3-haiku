@@ -11,7 +11,7 @@ import Header from '@/components/Header';
 import ChatInput from '@/components/ChatInput';
 import ChatMessage from '@/components/ChatMessage';
 import WelcomeScreen from '@/components/WelcomeScreen';
-import { claude, jailbreakGPT } from './lib/claude';
+import { claude } from './lib/claude';
 import { initDB, saveAllSessionsToDB, getAllSessionsFromDB, clearDB } from './lib/db';
 import { toast } from 'sonner';
 import ShareDialog from './components/ShareDialog';
@@ -37,36 +37,30 @@ interface ChatSession {
 const queryClient = new QueryClient();
 
 function MainApp() {
-    // Logic State
     const [sessions, setSessions] = useState<ChatSession[]>([]);
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
     const [customInstruction, setCustomInstruction] = useState('');
-    const [jailbreakMode, setJailbreakMode] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [chatToShare, setChatToShare] = useState<SharedChat | null>(null);
 
-    // UI State
-    const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed on mobile
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    // Check if desktop on mount
     useEffect(() => {
         if (window.innerWidth >= 1024) {
             setSidebarOpen(true);
         }
     }, []);
 
-    // Initialize & Load Sessions
     useEffect(() => {
         const loadSessions = async () => {
             try {
                 await initDB();
                 let loaded = await getAllSessionsFromDB();
 
-                // Migration from localStorage if DB is empty
                 if (!loaded || loaded.length === 0) {
                     const local = localStorage.getItem('shiroko_sessions');
                     if (local) {
@@ -87,11 +81,10 @@ function MainApp() {
                         const foundSession = valid.find((s: any) => s.id === lastId);
                         setCurrentSessionId(foundSession ? lastId : valid[0].id);
                         setInitialLoadComplete(true);
-                        return; // Exit early, don't create new session
+                        return;
                     }
                 }
 
-                // Only create new session if no valid sessions exist
                 const newSession: ChatSession = {
                     id: Date.now().toString(),
                     title: 'Chat Baru',
@@ -105,7 +98,6 @@ function MainApp() {
 
             } catch (e) {
                 console.error("DB Error", e);
-                // Create fallback session on error
                 const newSession: ChatSession = {
                     id: Date.now().toString(),
                     title: 'Chat Baru',
@@ -125,7 +117,6 @@ function MainApp() {
 
     }, []);
 
-    // Persist Sessions (only when data changes, not on initial load)
     useEffect(() => {
         if (sessions.length > 0 && initialLoadComplete) {
             saveAllSessionsToDB(sessions);
@@ -133,12 +124,10 @@ function MainApp() {
         }
     }, [sessions, initialLoadComplete]);
 
-    // Persist Active Session
     useEffect(() => {
         if (currentSessionId) localStorage.setItem('shiroko_active_session_id', currentSessionId);
     }, [currentSessionId]);
 
-    // Persist Instruction
     useEffect(() => {
         if (customInstruction !== '') {
             localStorage.setItem('shiorko_custom_instruction', customInstruction);
@@ -227,9 +216,7 @@ function MainApp() {
                 contextMessage = `[Previous Context]\n${historyContext}\n\n[User Message]\n${content}`;
             }
 
-            // Use jailbreak GPT or normal Claude based on mode
-            const apiCall = jailbreakMode ? jailbreakGPT : claude;
-            const data = await apiCall({
+            const data = await claude({
                 message: contextMessage,
                 instruction: customInstruction,
                 sessionId: currentSess?.aiSessionId,
@@ -261,7 +248,7 @@ function MainApp() {
         } finally {
             setIsLoading(false);
         }
-    }, [currentSessionId, sessions, isLoading, customInstruction, jailbreakMode]);
+    }, [currentSessionId, sessions, isLoading, customInstruction]);
 
     const handleAnimationComplete = useCallback((msgId: string) => {
         setSessions(prev => prev.map(s => {
@@ -359,8 +346,6 @@ function MainApp() {
                 onClearAll={handleClearAll}
                 customInstruction={customInstruction}
                 setCustomInstruction={setCustomInstruction}
-                jailbreakMode={jailbreakMode}
-                setJailbreakMode={setJailbreakMode}
             />
 
             <main className="flex-1 flex flex-col min-w-0 relative">

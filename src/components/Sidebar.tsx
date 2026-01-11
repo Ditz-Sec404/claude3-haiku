@@ -31,8 +31,6 @@ interface SidebarProps {
   onClearAll: () => void;
   customInstruction: string;
   setCustomInstruction: (val: string) => void;
-  jailbreakMode: boolean;
-  setJailbreakMode: (val: boolean) => void;
 }
 
 const Sidebar = ({
@@ -45,9 +43,7 @@ const Sidebar = ({
   onDeleteChat,
   onClearAll,
   customInstruction,
-  setCustomInstruction,
-  jailbreakMode,
-  setJailbreakMode
+  setCustomInstruction
 }: SidebarProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmClearAll, setConfirmClearAll] = useState(false);
@@ -158,8 +154,6 @@ const Sidebar = ({
         onClose={() => setSettingsOpen(false)}
         customInstruction={customInstruction}
         setCustomInstruction={setCustomInstruction}
-        jailbreakMode={jailbreakMode}
-        setJailbreakMode={setJailbreakMode}
       />
 
       {/* Confirm Clear All Dialog */}

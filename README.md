@@ -1,56 +1,86 @@
 # Claude 3 AI Chat
 
-Modern, minimalist AI Chat interface powered by Claude 3, built with React, Vite, Tailwind CSS, and Framer Motion.
+Antarmuka AI Chat modern dan minimalis yang didukung oleh Claude 3, dibangun dengan React, Vite, Tailwind CSS, dan Framer Motion.
+
+![Preview](https://img.shields.io/badge/Claude_3-Haiku-blue) ![React](https://img.shields.io/badge/React-18-61dafb) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6)
+
+## Fitur
+
+- 🎨 **UI Minimalis** - Desain bersih ala iOS
+- 💬 **Streaming Cepat** - Animasi teks yang halus
+- 🤖 **Claude 3 Haiku** - Didukung AI dari Anthropic
+- 📱 **Responsif Mobile** - Berfungsi di semua perangkat
+- 🌙 **Mode Gelap/Terang** - Tema otomatis
+- 💾 **Sesi Tersimpan** - Riwayat chat disimpan di IndexedDB
+- 📊 **Grafik** - Chart Bar, Line, Pie, Donut
+- 📝 **Markdown** - Syntax highlighting untuk kode
+- 🗂️ **Multi Sesi** - Kelola banyak percakapan
+- ✏️ **Edit Pesan** - Edit pesan kapan saja
+- 🔄 **Regenerasi** - Regenerasi jawaban AI
+- ⏹️ **Stop Generasi** - Batalkan respons AI
+- 🔗 **Bagikan Chat** - Buat link untuk berbagi
+- 🔁 **Retry Error** - Coba ulang saat gagal
 
 ## Tech Stack
 
-- **Framework**: React + Vite
-- **Styling**: Tailwind CSS + Custom LobeUI-inspired Design
-- **Animation**: Framer Motion
-- **Icons**: Iconsax React
-- **AI Backend**: Claude 3 Haiku (via MiniToolAI)
-- **Charts**: Chart.js + react-chartjs-2
-- **Markdown**: react-markdown + remark-gfm
-- **Code Highlighting**: react-syntax-highlighter
+| Kategori | Teknologi |
+| -------- | --------- |
+| Framework | React 18 + Vite |
+| Bahasa | TypeScript |
+| Styling | Tailwind CSS |
+| Animasi | Framer Motion |
+| Icons | Iconsax React, Lucide |
+| AI Backend | Claude 3 Haiku |
+| Charts | Chart.js |
+| Markdown | react-markdown |
+| Code Highlight | react-syntax-highlighter |
+| Diagram | Mermaid |
+| Storage | IndexedDB |
 
-## Setup & Run
+## Instalasi
 
-1. Install dependencies:
+```bash
+# Install dependencies
+npm install
 
-   ```bash
-   npm install
-   ```
+# Jalankan development server
+npm run dev
 
-2. Start the development server:
+# Build untuk production
+npm run build
+```
 
-   ```bash
-   npm run dev
-   ```
+## Struktur Proyek
 
-## Project Structure
-
-- `src/App.tsx`: Main Chat Interface and Logic
-- `src/lib/claude.ts`: Client-side API caller
-- `src/lib/db.ts`: IndexedDB for session storage
-- `claude-core.js`: Claude 3 API integration for dev server
-- `api/chat.js`: Edge API handler for Vercel deployment
-- `vite.config.ts`: Vite configuration with Claude API middleware
-- `src/index.css`: Tailwind and Global Styles
-
-## Features
-
-- 🎨 Minimalist, iOS-inspired UI
-- 💬 Fast streaming text animation
-- 🤖 Claude 3 Haiku AI Model
-- ✨ Smooth & lightweight animations
-- 📱 Mobile Responsive
-- 🌙 Dark/Light mode toggle
-- 💾 Persistent chat sessions (IndexedDB)
-- 📊 Chart rendering support (Bar, Line, Pie, Donut)
-- 📝 Markdown rendering with code syntax highlighting
-- 🗂️ Multi-session chat management
-- ⏰ Real-time date/time awareness
+```text
+src/
+├── App.tsx              # Aplikasi utama
+├── components/
+│   ├── ChatInput.tsx    # Input pesan
+│   ├── ChatMessage.tsx  # Tampilan pesan
+│   ├── Header.tsx       # Navigasi atas
+│   ├── Sidebar.tsx      # Daftar sesi
+│   ├── SettingsDialog.tsx
+│   ├── ShareDialog.tsx  # Modal bagikan
+│   ├── SharedChatView.tsx
+│   ├── WelcomeScreen.tsx
+│   └── ui/              # Komponen UI
+├── lib/
+│   ├── claude.ts        # API client
+│   ├── db.ts            # Penyimpanan IndexedDB
+│   └── share.ts         # Utilitas share
+└── hooks/
+```
 
 ## Deployment
 
-This project is configured for Vercel deployment with Edge Runtime API.
+Proyek ini dikonfigurasi untuk deployment Vercel dengan Edge Runtime API.
+
+```bash
+# Deploy ke Vercel
+vercel deploy
+```
+
+## Lisensi
+
+MIT

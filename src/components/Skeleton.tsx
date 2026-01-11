@@ -15,7 +15,6 @@ export const Skeleton = ({ className }: SkeletonProps) => {
     );
 };
 
-// Chat message skeleton
 export const MessageSkeleton = () => {
     return (
         <div className="flex justify-start">
@@ -28,7 +27,6 @@ export const MessageSkeleton = () => {
     );
 };
 
-// Sidebar chat list skeleton
 export const ChatListSkeleton = () => {
     return (
         <div className="space-y-2">

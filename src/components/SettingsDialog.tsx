@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Moon, Sun, Zap } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { CloseCircle, Setting2, MagicStar } from "iconsax-react";
 import { Button } from "./ui/button";
 import { useTheme } from "./ThemeProvider";
@@ -10,17 +10,13 @@ interface SettingsDialogProps {
   onClose: () => void;
   customInstruction: string;
   setCustomInstruction: (val: string) => void;
-  jailbreakMode: boolean;
-  setJailbreakMode: (val: boolean) => void;
 }
 
 const SettingsDialog = ({
   isOpen,
   onClose,
   customInstruction,
-  setCustomInstruction,
-  jailbreakMode,
-  setJailbreakMode
+  setCustomInstruction
 }: SettingsDialogProps) => {
   const { theme, setTheme } = useTheme();
   const [visible, setVisible] = useState(false);
@@ -41,7 +37,6 @@ const SettingsDialog = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto">
-      {/* Overlay */}
       <div
         onClick={onClose}
         className={cn(
@@ -50,7 +45,6 @@ const SettingsDialog = ({
         )}
       />
 
-      {/* Dialog */}
       <div
         className={cn(
           "relative z-10 w-full max-w-md transition-all duration-150",
@@ -58,7 +52,6 @@ const SettingsDialog = ({
         )}
       >
         <div className="bg-card rounded-2xl shadow-strong border border-border p-6 max-h-[85vh] overflow-y-auto scrollbar-thin">
-          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Setting2 size={24} variant="Linear" className="text-primary" />
@@ -75,50 +68,6 @@ const SettingsDialog = ({
           </div>
 
           <div className="space-y-6">
-            {/* GPT Mode Section */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Zap size={18} className="text-yellow-500" />
-                <h3 className="text-sm font-medium text-muted-foreground">Mode GPT</h3>
-              </div>
-              <button
-                onClick={() => setJailbreakMode(!jailbreakMode)}
-                className={cn(
-                  "w-full flex items-center justify-between py-4 px-4 rounded-xl border-2 transition-all duration-150",
-                  jailbreakMode
-                    ? "border-yellow-500 bg-yellow-500/10"
-                    : "border-border hover:border-yellow-500/50"
-                )}
-              >
-                <div className="flex flex-col items-start">
-                  <span className={cn(
-                    "font-medium",
-                    jailbreakMode ? "text-yellow-500" : "text-foreground"
-                  )}>
-                    {jailbreakMode ? "Aktif" : "Nonaktif"}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {jailbreakMode
-                      ? "Menggunakan GPT Turbo"
-                      : "Menggunakan Claude 3 Haiku (default)"}
-                  </span>
-                </div>
-                <div className={cn(
-                  "w-12 h-7 rounded-full transition-colors duration-150 relative",
-                  jailbreakMode ? "bg-yellow-500" : "bg-muted"
-                )}>
-                  <div className={cn(
-                    "absolute top-1 w-5 h-5 rounded-full bg-white shadow-md transition-all duration-150",
-                    jailbreakMode ? "right-1" : "left-1"
-                  )} />
-                </div>
-              </button>
-              <p className="text-xs text-muted-foreground mt-2">
-                Model alternatif untuk variasi jawaban. Bukan bypass filter, hanya mengganti AI yang digunakan.
-              </p>
-            </div>
-
-            {/* Theme Section */}
             <div>
               <h3 className="text-sm font-medium mb-3 text-muted-foreground">Tampilan</h3>
               <div className="grid grid-cols-2 gap-3 mb-3">
@@ -161,7 +110,6 @@ const SettingsDialog = ({
               </button>
             </div>
 
-            {/* Custom Instructions Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <MagicStar size={18} variant="Linear" className="text-primary" />
